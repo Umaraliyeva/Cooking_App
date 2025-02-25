@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/frontend/editUser.html").permitAll()
                         .requestMatchers("/frontend/addUser.html").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/**").permitAll()
 
                         .anyRequest().authenticated());
         http.userDetailsService(customUserDetailService);
