@@ -10,8 +10,4 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/profile")
 public class ProfileController {
 
-    @GetMapping
-    public String getCurrentUserProfile(@AuthenticationPrincipal User user) {
-
-    }
 }
