@@ -34,6 +34,9 @@ public class Recipe {
     @ElementCollection
     private List<String> steps;
 
+    @ManyToOne // ✅ Ko‘plab Recipe-lar bitta User ga tegishli bo‘ladi
+    private User user;
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Ingredient> ingredients;
     @ManyToMany
@@ -42,12 +45,5 @@ public class Recipe {
     private LocalDateTime createdAt; // vaqt berish kere qachon create qilinganiga qarab
                                     // recently added da sort qilib chiqaramiz
                                    //  masalan 2 kun oldin qo'shilgan yangi receptlarni chiqaramiz
-
-
-
-
-
-
-
 
 }
