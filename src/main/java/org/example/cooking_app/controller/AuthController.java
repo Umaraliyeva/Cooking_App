@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.annotation.MultipartConfig;
 import lombok.RequiredArgsConstructor;
 import org.example.cooking_app.dto.LoginDTO;
+import org.example.cooking_app.dto.OauthClientDTO;
 import org.example.cooking_app.entity.Attachment;
 import org.example.cooking_app.entity.AttachmentContent;
 import org.example.cooking_app.entity.Role;
@@ -16,25 +17,29 @@ import org.example.cooking_app.repo.UserRepository;
 import org.example.cooking_app.service.EmailService;
 import org.example.cooking_app.service.EmailVerificationService;
 import org.example.cooking_app.service.TokenService;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/auth")
 @RequiredArgsConstructor
 @MultipartConfig
 
@@ -51,6 +56,8 @@ public class AuthController {
     private final AttachmentContentRepository attachmentContentRepository;
     private final RoleRepository roleRepository;
     private final AttachmentRepository attachmentRepository;
+
+
 
 
     @PostMapping("/login")
@@ -117,7 +124,6 @@ public class AuthController {
             System.out.println("User not found: " + email);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not found!");
         }else {
-
             String code = emailService.sendVerificationCode(email);
             userOpt.get().setTempCode(Integer.parseInt(code));
             userRepository.save(userOpt.get());

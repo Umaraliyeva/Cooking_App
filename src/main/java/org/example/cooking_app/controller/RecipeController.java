@@ -2,7 +2,6 @@ package org.example.cooking_app.controller;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.example.cooking_app.entity.RecentSearch;
 import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.RecentSearchRepository;
@@ -12,8 +11,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -34,7 +31,7 @@ public class RecipeController {
 
 
     @Tag(name = " bugundan boshlab ohirgi 2 kun ichida creat qilingan yangi recipe larni olib keladi")
-    @GetMapping("/recentRecipes")
+    @GetMapping("/newRecipes")
     public HttpEntity<?> getRecentRecipes(){
         return ResponseEntity.status(200).body(recipeService.getRecipesFromLastTwoDays());
     }

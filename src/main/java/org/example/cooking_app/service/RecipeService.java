@@ -54,7 +54,7 @@ public class RecipeService {
         if ("newest".equalsIgnoreCase(timeFilter)) {
             fromDate = LocalDateTime.now().minusDays(7);
         } else if ("oldest".equalsIgnoreCase(timeFilter)) {
-            toDate = LocalDateTime.now().minusYears(1);
+            toDate = LocalDateTime.now().minusYears(1); // 7 jkundan tashqari hammasi oldest bo'ladi
         } else if ("popularity".equalsIgnoreCase(timeFilter)) {
             popularRecipeIds = recentSearchRepository.findMostSearchedRecipeIds();
         }

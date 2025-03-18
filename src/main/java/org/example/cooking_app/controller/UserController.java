@@ -48,5 +48,6 @@ public class UserController {
                                                  @AuthenticationPrincipal User user) {
         boolean isSaved = userService.isRecipeSaved(user, recipeId);
         return ResponseEntity.ok(isSaved);
+
     }
 }

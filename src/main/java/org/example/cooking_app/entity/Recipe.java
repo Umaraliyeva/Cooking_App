@@ -39,6 +39,7 @@ public class Recipe {
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Ingredient> ingredients;
+
     @ManyToMany
     List<Category> categories;
     @CreationTimestamp
