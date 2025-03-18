@@ -5,7 +5,6 @@ import org.example.cooking_app.entity.RecentSearch;
 import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.RecentSearchRepository;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -21,13 +20,13 @@ public class RecentSearchService {
         this.recentSearchRepository = recentSearchRepository;
     }
 
-    public HttpEntity<?> saveRecentSearch(User user, Recipe recipe) {
+    public void saveRecentSearch(User user, Recipe recipe) {
         RecentSearch recentSearch = RecentSearch.builder()
                 .user(user)
                 .recipe(recipe)
                 .date(LocalDateTime.now()) // Search qilingan vaqt
                 .build();
-       return ResponseEntity.status(201).body( recentSearchRepository.save(recentSearch));
+        ResponseEntity.status(201).body(recentSearchRepository.save(recentSearch));
     }
 
 

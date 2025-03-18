@@ -40,11 +40,10 @@ public class SecurityConfig {
                         .requestMatchers( "/auth/**","/superAdmin/user/**","/role","/user","/user/**","/frontend/userCRUD.html", "/frontend/login.html","http://localhost:8080/file/**","/file/**", "/market/**", "/product/**", "/category/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/frontend/index.html").hasRole("ADMIN")
-                        .requestMatchers("/frontend/editUser.html").permitAll()
+                        .requestMatchers("/frontend/editUser.html","/api/recipes").permitAll()
                         .requestMatchers("/frontend/addUser.html").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/api/**").permitAll()
-
                         .anyRequest().authenticated());
         http.userDetailsService(customUserDetailService);
         http.addFilterBefore(myFilter,UsernamePasswordAuthenticationFilter.class);

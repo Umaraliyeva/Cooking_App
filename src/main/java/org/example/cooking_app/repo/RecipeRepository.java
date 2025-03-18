@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
 
@@ -43,4 +44,6 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             @Param("categoryId") Integer categoryId,
             @Param("timeFilter") String timeFilter
     );
+
+    Optional<Recipe> findByNameIgnoreCase(String name);
 }

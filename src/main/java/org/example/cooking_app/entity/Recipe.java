@@ -26,28 +26,27 @@ public class Recipe {
     private String description;
     @ManyToOne
     private Attachment photo;
+
     private Integer duration;
 
     @Min(value = 1) @Max(value = 5)
     private Integer likes;
+
     private String link;
     @ElementCollection
     private List<String> steps;
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Ingredient> ingredients;
+    @ManyToOne
+    private User user;
+
     @ManyToMany
     List<Category> categories;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RecipeIngredient> recipeIngredients;
+
     @CreationTimestamp
     private LocalDateTime createdAt; // vaqt berish kere qachon create qilinganiga qarab
                                     // recently added da sort qilib chiqaramiz
                                    //  masalan 2 kun oldin qo'shilgan yangi receptlarni chiqaramiz
-
-
-
-
-
-
-
-
 }

@@ -1,29 +1,41 @@
 package org.example.cooking_app.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Part;
 import lombok.RequiredArgsConstructor;
-import org.example.cooking_app.entity.RecentSearch;
+import lombok.SneakyThrows;
+import org.example.cooking_app.dto.RecipeDTO;
 import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.RecentSearchRepository;
 import org.example.cooking_app.service.RecentSearchService;
 import org.example.cooking_app.service.RecipeService;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/recipes")
 @RequiredArgsConstructor
+@MultipartConfig
 public class RecipeController {
 
     private final RecipeService recipeService;
     private final RecentSearchService recentSearchService;
     private final RecentSearchRepository recentSearchRepository;
+    private final ObjectMapper jacksonObjectMapper;
 
 
     @Tag(name = "category id bo'yicha sort qilingan recipe lar")
@@ -61,11 +73,29 @@ public class RecipeController {
         List<Recipe> recipes = recipeService.filterRecipes(timeFilter, rateFilter, categoryId);
         return ResponseEntity.status(200).body(recipes);
     }
+
+
     @Tag(name = "user search, filter qilganda recipe ni ustiga bossa recipe id keladi , va recentSearch ga o'sha boskan recipe qo'shiladi ")
-    @GetMapping("/{recipeId}")
-    public ResponseEntity<?> getRecipeById(@PathVariable Integer recipeId,@AuthenticationPrincipal User user) {
+    @GetMapping("/search/{recipeId}")//o'zgartirish
+    public ResponseEntity<?> getSearchedRecipeById(@PathVariable Integer recipeId,@AuthenticationPrincipal User user) {
         Recipe recipe = recipeService.getRecipeById(recipeId);
-        return ResponseEntity.status(201).body(recentSearchService.saveRecentSearch(user, recipe));
+        recentSearchService.saveRecentSearch(user, recipe);
+        return ResponseEntity.status(201).body(recipeService.getRecipeById(recipeId));
     }
 
+    @Tag(name = "user birinchi kirganida chiqib turgan retseptlardan birortasini tanlaganda id keladi")
+    @GetMapping("/{recipeId}")
+    public ResponseEntity<?> getRecipeById(@PathVariable Integer recipeId) {
+       return ResponseEntity.status(201).body(recipeService.getRecipeById(recipeId));
+
+    }
+
+    @SneakyThrows
+    @Tag(name = "recipe add qilish")
+    @PostMapping
+    public HttpEntity<?> addRecipe(
+                                   @RequestBody RecipeDTO  recipeDTO,
+                                   @AuthenticationPrincipal User user) throws IOException {
+        return ResponseEntity.status(201).body(recipeService.addRecipe(recipeDTO,user));
+    }
 }

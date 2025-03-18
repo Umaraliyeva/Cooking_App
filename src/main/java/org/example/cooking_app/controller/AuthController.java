@@ -1,5 +1,8 @@
 package org.example.cooking_app.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.annotation.MultipartConfig;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,7 @@ import org.example.cooking_app.service.EmailVerificationService;
 import org.example.cooking_app.service.TokenService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,7 +41,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@MultipartConfig
+//@MultipartConfig
 
 public class AuthController {
 
@@ -69,8 +74,8 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/register")
-    public HttpEntity<?>registerUser(
+@PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public HttpEntity<?> registerUser(
             @RequestParam("username") String username,
             @RequestParam("fullName") String fullName,
             @RequestParam("password") String password,
@@ -86,15 +91,15 @@ public class AuthController {
                 .attachment(attachment)
                 .build();
         attachmentContentRepository.save(attachmentContent);
+
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER).orElseThrow();
 
-
-        User user = User.builder()
+    User user = User.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .fullName(fullName)
                 .profilePicture(attachment)
-                .roles(List.of(userRole))
+                .roles(new ArrayList<>(List.of(userRole)))
                 .build();
 
         userRepository.save(user);
