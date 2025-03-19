@@ -47,7 +47,7 @@ public class SecurityConfig {
 
                         .anyRequest().authenticated());
         http.userDetailsService(customUserDetailService);
-        http.addFilterBefore(myFilter,UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

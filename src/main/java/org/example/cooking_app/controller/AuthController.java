@@ -69,14 +69,15 @@ public class AuthController {
 
             User user = (User) authenticate.getPrincipal();
             String token = tokenService.generateToken(user);
+            System.out.println("User keldi:"+user);
 
-            return ResponseEntity.ok(Map.of("token", token)); // JSON shaklida qaytarish
+            return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
 
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public HttpEntity<?>registerUser(
             @RequestParam("username") String username,
             @RequestParam("fullName") String fullName,
@@ -105,6 +106,7 @@ public class AuthController {
                 .build();
 
         userRepository.save(user);
+        System.out.println("User "+user);
 
         return ResponseEntity.ok("User registered successfully");
     }
@@ -143,7 +145,7 @@ public class AuthController {
             if (emailVerificationService.isBlocked(email)) {
                 return ResponseEntity.status(403).body("3 martadan ortiq xato kod kiritildi. Hisobingiz vaqtincha bloklandi.");
             }
-            return ResponseEntity.status(400).body("Kod noto‘g‘ri. Qayta urinib ko‘ring!");
+            return ResponseEntity.status(400).body("Kod noto‘g‘ri. Q ayta urinib ko‘ring!");
         }
     }
     @Tag(name="yangi password kiritadi")

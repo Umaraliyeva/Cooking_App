@@ -26,6 +26,7 @@ public class UserController {
         if (user == null) {
             return ResponseEntity.status(401).body("Unauthorized");
         }
+        System.out.println("keldi::");
         Map<String, Object> userData = new HashMap<>();
         userData.put("id", user.getId());
         userData.put("fullname", user.getFullName());
@@ -42,7 +43,6 @@ public class UserController {
         return ResponseEntity.ok(status);
     }
 
-    // ✅ Retsept saqlangan yoki yo‘qligini tekshirish
     @GetMapping("/is-saved/{recipeId}")
     public ResponseEntity<Boolean> isRecipeSaved(@PathVariable Integer recipeId,
                                                  @AuthenticationPrincipal User user) {
