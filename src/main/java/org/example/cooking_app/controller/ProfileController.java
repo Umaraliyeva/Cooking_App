@@ -1,17 +1,15 @@
 package org.example.cooking_app.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.example.cooking_app.entity.User;
 import org.example.cooking_app.service.ProfileService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/profile")
+@Tag(name = "Profile API", description = "Foydalanuvchi profili bilan ishlash uchun API")
 public class ProfileController {
 
     private final ProfileService profileService;
@@ -20,9 +18,9 @@ public class ProfileController {
         this.profileService = profileService;
     }
 
-    @GetMapping("/getCurrentUserProfile")
-    @Tag(name = "Profile", description = "Profile uchun user va recipe objectdan malumotlarni olib keladi")
-    public HttpEntity<?> getCurrentUserProfile(@AuthenticationPrincipal User user) {
-        return ResponseEntity.status(200).body(profileService.getProfile(user.getId()));
+    @Operation(summary = "Foydalanuvchi profilini olish", description = "Berilgan userId bo‘yicha foydalanuvchi va recipe objectdan ma'lumotlarni qaytaradi")
+    @GetMapping("/getCurrentUserProfile/{userId}")
+    public HttpEntity<?> getCurrentUserProfile(@PathVariable Integer userId) {
+        return ResponseEntity.status(200).body(profileService.getProfile(userId));
     }
 }

@@ -14,15 +14,19 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
 
   //Profile uchun userdan kerakli malumotlarni yegib olish
+
   @Query(value = """
-   SELECT u.id, u.username, u.full_name AS fullName,
+   SELECT u.id, u.full_name AS fullName,
         u.profile_picture_id AS profilePictureId, u.info,
         (SELECT COUNT(*) FROM users_followers uf WHERE uf.followers_id = u.id) AS followersCount,
         (SELECT COUNT(*) FROM users_followings uf WHERE uf.followings_id = u.id) AS followingCount,
+        (SELECT COUNT(*) FROM recipe r WHERE r.user_id = u.id) AS recipesCount,
         u.profession
    FROM users u WHERE u.id = :userId
 """, nativeQuery = true)
   List<Object[]> getProfileDTOById(@Param("userId") Integer userId);
+
+
 
 
 

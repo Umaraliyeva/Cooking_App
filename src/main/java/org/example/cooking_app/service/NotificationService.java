@@ -1,11 +1,14 @@
 package org.example.cooking_app.service;
 
 import org.example.cooking_app.entity.Notification;
+import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.NotificationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -14,10 +17,16 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
 
+
     public NotificationService(NotificationRepository notificationRepository) {
         this.notificationRepository = notificationRepository;
     }
 
+    public HttpEntity<?> createNotification(User receiver, String message) {
+        Notification notification = new Notification(null, message, false, LocalDateTime.now(), receiver);
+        notificationRepository.save(notification);
+        return ResponseEntity.status(200).body(notification);
+    }
     public List<Map<String, Object>> getAllNotificationsByUserId(Integer id) {
         List<Object[]> results = notificationRepository.findByUserId(id);
 

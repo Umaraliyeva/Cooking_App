@@ -55,14 +55,17 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer>, JpaSpe
     @Query(value = """
     SELECT r.id, r.name, r.description, r.photo_id AS photoId, r.duration, r.likes, 
            r.link, STRING_AGG(s.steps, ',') AS steps, 
-           NULL AS ingredients, NULL AS categories, r.created_at AS createdAt
+           r.created_at AS createdAt  
     FROM recipe r
     LEFT JOIN recipe_steps s ON r.id = s.recipe_id
     WHERE r.user_id = :userId
     GROUP BY r.id, r.name, r.description, r.photo_id, r.duration, r.likes, 
              r.link, r.created_at
+    ORDER BY r.created_at DESC
 """, nativeQuery = true)
     List<Object[]> getRecipesByUserId(@Param("userId") Integer userId);
+
+
 
 
 }

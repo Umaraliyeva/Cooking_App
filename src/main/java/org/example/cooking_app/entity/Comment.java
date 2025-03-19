@@ -1,5 +1,6 @@
 package org.example.cooking_app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,9 +22,13 @@ public class Comment {
     private Integer id;
     private String text;
     private LocalDateTime date;
+
     @ManyToOne
+    @JsonIgnore // 👈 Rekursiyani oldini olish uchun qo‘shildi
     private User user;
+
     @ManyToOne
+    @JsonIgnore // 👈 Rekursiyani oldini olish uchun qo‘shildi
     private Recipe recipe;
     @ElementCollection
     private Map<User,Integer> likes;

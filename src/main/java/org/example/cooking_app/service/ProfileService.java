@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,16 +35,17 @@ public class ProfileService {
 
         ProfileDTO profileDTO = new ProfileDTO(
                 ((Number) row[0]).intValue(), // id
-                (String) row[1], // username
-                (String) row[2], // fullName
-                row[3] != null ? ((Number) row[3]).intValue() : null, // profilePictureId
-                (String) row[4], // info
-                ((Number) row[5]).intValue(), // followersCount
-                ((Number) row[6]).intValue(), // followingCount
+                (String) row[1], // fullName (query bo‘yicha 2-ustun)
+                row[2] != null ? ((Number) row[2]).intValue() : null, // profilePictureId
+                (String) row[3], // info
+                ((Number) row[4]).intValue(), // followersCount
+                ((Number) row[5]).intValue(), // followingCount
+                ((Number) row[6]).intValue(), // recipesCount
                 (String) row[7] // profession
         );
 
-    // ✅ Recipe larni olib kelamiz
+
+        // ✅ Recipe larni olib kelamiz
         List<Object[]> recipeObjects = recipeRepository.getRecipesByUserId(userId);
         List<RecipeDTO> recipes = mapToRecipeDTO(recipeObjects);
 
@@ -68,6 +70,10 @@ public class ProfileService {
 
     // 🔹 Recipe obyektlarini DTO ga aylantirish
     private List<RecipeDTO> mapToRecipeDTO(List<Object[]> results) {
+        for (Object[] row : results) {
+            System.out.println("createdAt: " + row[8]);
+        }
+
         return results.stream().map(row -> new RecipeDTO(
                 ((Number) row[0]).intValue(), // id
                 (String) row[1], // name
@@ -79,9 +85,14 @@ public class ProfileService {
                 row[7] != null ? List.of(((String) row[7]).split(",")) : List.of(), // steps
                 null, // ingredients (keyin qo'shamiz)
                 null, // categories (keyin qo'shamiz)
-                row[8] != null ? ((java.sql.Timestamp) row[8]).toLocalDateTime() : null // createdAt
+                row[8] != null ?
+                        (row[8] instanceof java.sql.Timestamp
+                                ? ((java.sql.Timestamp) row[8]).toLocalDateTime()
+                                : LocalDateTime.parse(row[8].toString()))
+                        : null // createdAt
         )).toList();
     }
+
 
     // 🔹 Ingredient obyektlarini DTO ga aylantirish
     private List<IngredientDTO> mapToIngredientDTO(List<Object[]> results) {
