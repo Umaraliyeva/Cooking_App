@@ -1,5 +1,6 @@
 package org.example.cooking_app.repo;
 
+import org.example.cooking_app.dto.RecipeDTO;
 import org.example.cooking_app.entity.Recipe;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -43,4 +44,21 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer> {
             @Param("categoryId") Integer categoryId,
             @Param("timeFilter") String timeFilter
     );
+
+
+
+    //Profile uchun recipe dan kerakli malumotlarni yegib olish
+    @Query(value = """
+    SELECT r.id, r.name, r.description, r.photo_id AS photoId, r.duration, r.likes, 
+           r.link, STRING_AGG(s.steps, ',') AS steps, 
+           NULL AS ingredients, NULL AS categories, r.created_at AS createdAt
+    FROM recipe r
+    LEFT JOIN recipe_steps s ON r.id = s.recipe_id
+    WHERE r.user_id = :userId
+    GROUP BY r.id, r.name, r.description, r.photo_id, r.duration, r.likes, 
+             r.link, r.created_at
+""", nativeQuery = true)
+    List<Object[]> getRecipesByUserId(@Param("userId") Integer userId);
+
+
 }
