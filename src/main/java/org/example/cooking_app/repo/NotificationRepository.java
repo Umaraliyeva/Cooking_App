@@ -13,27 +13,30 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     @Query("""
     SELECT n.id, n.title, n.read, n.dateTime 
     FROM Notification n 
-    WHERE n.user.id = :id
+    WHERE n.user.id = :id 
+    ORDER BY n.dateTime DESC
 """)
     List<Object[]> findByUserId(@Param("id") Integer id);
 
 
-    //Faqat read = true larni olib keladigan query
+    // Faqat read = true bo'lgan notificationlarni olib keladi (o'qilganlar)
     @Query("""
     SELECT n.id, n.title, n.read, n.dateTime 
     FROM Notification n
     WHERE n.read = true AND n.user.id = :userId
+    ORDER BY n.dateTime DESC
 """)
     List<Object[]> findReadNotificationsByUser(Integer userId);
 
-
-    //Unread yaniy read = false bolganlarini olib keladi
+    // Unread, ya'ni read = false bo'lgan notificationlarni olib keladi (o'qilmaganlar)
     @Query("""
     SELECT n.id, n.title, n.read, n.dateTime 
     FROM Notification n
     WHERE n.read = false AND n.user.id = :userId
+    ORDER BY n.dateTime DESC
 """)
     List<Object[]> findUnreadNotificationsByUser(Integer userId);
+
 
 
 }
