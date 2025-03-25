@@ -24,22 +24,13 @@ public class RecipeDTO {
     private Integer id;
     private String name;
     private String description;
-//    private String link;
     private Integer photoId; //Attachment ni id sini olib keladi faqat
     private Integer duration;
     private Integer likes;
     private String link;
     private List<String> steps;
-    private List<Integer> categoryIds;
-
-    private List<IngredientEntry> ingredientsOfRecipe; // ID + quantity
-
-    @Data
-    public static class IngredientEntry {
-        private Integer ingredientId;
-        private Integer quantity;
-    }
     List<IngredientDTO> ingredients;
     List<CategoryDTO> categories;
     private LocalDateTime createdAt;
+
 }

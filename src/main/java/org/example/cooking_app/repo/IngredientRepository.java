@@ -17,10 +17,11 @@ public interface IngredientRepository extends JpaRepository<Ingredient, Integer>
 
     //Profile uchun kerakli qisimni olib kelish
     @Query(value = """
-    SELECT i.id, i.name, i.photo_id AS photoId, i.quantity
-    FROM ingredient i
-    WHERE i.recipe_id = :recipeId
-""", nativeQuery = true)
+    SELECT ing.id, ing.name, ing.photo_id AS photoId, ri.quantity
+    FROM recipe_ingredient ri
+    JOIN ingredient ing ON ri.ingredient_id = ing.id
+    WHERE ri.recipe_id = :recipeId
+    """, nativeQuery = true)
     List<Object[]> getIngredientsByRecipeId(@Param("recipeId") Integer recipeId);
 
 }

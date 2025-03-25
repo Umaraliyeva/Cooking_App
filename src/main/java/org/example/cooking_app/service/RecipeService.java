@@ -1,7 +1,9 @@
 package org.example.cooking_app.service;
 
 import org.example.cooking_app.dto.IngredientDTO;
+import org.example.cooking_app.dto.IngredientjonDTO;
 import org.example.cooking_app.dto.RecipeDTO;
+import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.*;
 import org.example.cooking_app.repo.*;
 import jakarta.persistence.criteria.Join;
@@ -116,10 +118,10 @@ public class RecipeService {
         return recipeRepository.findById(recipeId).orElse(null);
     }
 
-    public HttpEntity<?> addRecipe(RecipeDTO recipedto, User user) throws IOException {
+    public HttpEntity<?> addRecipe(RecipejonDTO recipejondto, User user) throws IOException {
         // Avvalo duplicate ingredientlarni tekshirib chiqamiz:
         Set<Integer> ingredientIds = new HashSet<>();
-        for (RecipeDTO.IngredientEntry entry : recipedto.getIngredientsOfRecipe()) {
+        for (RecipejonDTO.IngredientEntry entry : recipejondto.getIngredientsOfRecipe()) {
             if (!ingredientIds.add(entry.getIngredientId())) {
                 // Duplicate ingredient topildi, shuning uchun umuman recipe yaratilmasin
                 return ResponseEntity
@@ -129,26 +131,26 @@ public class RecipeService {
         }
 
         // Agar duplicate topilmasa, recipe yaratishni davom ettiramiz:
-        String link = recipedto.getName().replace(" ", "_");
-        Attachment attachment = attachmentRepository.findById(recipedto.getPhotoId()).orElseThrow(()->new RuntimeException("Attachment not found"));
+        String link = recipejondto.getName().replace(" ", "_");
+        Attachment attachment = attachmentRepository.findById(recipejondto.getPhotoId()).orElseThrow(()->new RuntimeException("Attachment not found"));
             Recipe recipe = Recipe.builder().
-                    name(recipedto.getName()).
-                    description(recipedto.getDescription())
+                    name(recipejondto.getName()).
+                    description(recipejondto.getDescription())
                     .link("app.Recipe.co/"+link)
                     .user(user)
                     .photo(attachment)
-                    .duration(recipedto.getDuration())
-                    .steps(new ArrayList<>(recipedto.getSteps()))
+                    .duration(recipejondto.getDuration())
+                    .steps(new ArrayList<>(recipejondto.getSteps()))
                     .build();
 
-        List<Category> categories = categoryRepository.findAllById(recipedto.getCategoryIds());
+        List<Category> categories = categoryRepository.findAllById(recipejondto.getCategoryIds());
         recipe.setCategories(categories);
 
         recipeRepository.save(recipe);
 
         // RecipeIngredient larni tayyorlaymiz
             List<RecipeIngredient> recipeIngredients = new ArrayList<>();
-        for (RecipeDTO.IngredientEntry entry : recipedto.getIngredientsOfRecipe()) {
+        for (RecipejonDTO.IngredientEntry entry : recipejondto.getIngredientsOfRecipe()) {
             Ingredient ingredient = ingredientRepository.findById(entry.getIngredientId()).orElseThrow(() -> new RuntimeException("Ingredient not found"));
             RecipeIngredient recipeIngredient = RecipeIngredient.builder()
                     .recipe(recipe)
@@ -164,12 +166,12 @@ public class RecipeService {
     public HttpEntity<?> getIngredientsByRecipeId(Integer recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
         // RecipeIngredient obyektlaridan ingredient obyektlarini olish
-        List<IngredientDTO> ingredientDTOS = recipe.getRecipeIngredients()
+        List<IngredientjonDTO> ingredientDTOS = recipe.getRecipeIngredients()
                 .stream()
                 .map(ri -> {
                     // ingredient obyekti ichidan kerakli maydonlarni olib, DTO ga aylantiramiz
                     Ingredient ing = ri.getIngredient();
-                    return new IngredientDTO(ing.getPhoto(),ing.getName(),ri.getQuantity());
+                    return new IngredientjonDTO(ing.getPhoto(),ing.getName(),ri.getQuantity());
                 })
                 .distinct() // Agar takroriy bo'lsa, bitta nusxasi olinadi
                 .collect(Collectors.toList());

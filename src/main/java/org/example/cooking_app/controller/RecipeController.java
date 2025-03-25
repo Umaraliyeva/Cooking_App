@@ -13,6 +13,7 @@ import jakarta.servlet.http.Part;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.cooking_app.dto.RecipeDTO;
+import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.RecentSearchRepository;
@@ -93,9 +94,9 @@ public class RecipeController {
     @Tag(name = "recipe add qilish")
     @PostMapping
     public HttpEntity<?> addRecipe(
-                                   @RequestBody RecipeDTO  recipeDTO,
+                                   @RequestBody RecipejonDTO recipejonDTO,
                                    @AuthenticationPrincipal User user) throws IOException {
-        return ResponseEntity.status(201).body(recipeService.addRecipe(recipeDTO,user));
+        return ResponseEntity.status(201).body(recipeService.addRecipe(recipejonDTO,user));
     }
 
 

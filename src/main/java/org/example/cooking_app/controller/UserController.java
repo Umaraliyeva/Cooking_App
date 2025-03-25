@@ -69,6 +69,9 @@ public class UserController {
         // Recipe egasini olish
         User recipeOwner = recipe.getUser();
 
+        if (recipeOwner.equals(user)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("You can't follow yourself");
+        }
         Boolean follower = userRepository.isFollower(user.getId(), recipeId);
         // Agar foydalanuvchi allaqachon follow qilgan bo'lsa, xatolik qaytaramiz
         if (follower) {
@@ -88,6 +91,9 @@ public class UserController {
     public HttpEntity<?> unfollow(@PathVariable Integer recipeId, @AuthenticationPrincipal User user) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
         User recipeOwner = recipe.getUser();
+        if (recipeOwner.equals(user)) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("You can't unfollow yourself");
+        }
         Boolean follower = userRepository.isFollower(user.getId(), recipeId);
         if (follower) {
             recipeOwner.getFollowers().removeIf(followerjon -> followerjon.getId().equals(user.getId()));
