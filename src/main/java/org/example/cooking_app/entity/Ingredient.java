@@ -21,11 +21,6 @@ public class Ingredient {
     private String name;
     @ManyToOne
     private Attachment photo;
-   // private Integer quantity;  quantity alohida jadvalda turadi
-
-//    @ManyToOne
-//    @JsonBackReference
-//    private Recipe recipe;
 
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RecipeIngredient> recipeIngredients;

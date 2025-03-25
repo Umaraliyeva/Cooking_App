@@ -1,6 +1,7 @@
 package org.example.cooking_app.repo;
 
 import org.example.cooking_app.entity.Recipe;
+import org.example.cooking_app.entity.RecipeIngredient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,5 +1,6 @@
 package org.example.cooking_app.service;
 
+import org.example.cooking_app.dto.IngredientDTO;
 import org.example.cooking_app.dto.RecipeDTO;
 import org.example.cooking_app.entity.*;
 import org.example.cooking_app.repo.*;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -125,7 +127,26 @@ public class RecipeService {
             recipeIngredients.add(recipeIngredient);
         }
             recipeIngredientRepository.saveAll(recipeIngredients);
-            recipe.setRecipeIngredients(recipeIngredients);
             return ResponseEntity.status(HttpStatus.CREATED).body(recipe);
+    }
+
+    public HttpEntity<?> getIngredientsByRecipeId(Integer recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
+        // RecipeIngredient obyektlaridan ingredient obyektlarini olish
+        List<IngredientDTO> ingredientDTOS = recipe.getRecipeIngredients()
+                .stream()
+                .map(ri -> {
+                    // ingredient obyekti ichidan kerakli maydonlarni olib, DTO ga aylantiramiz
+                    Ingredient ing = ri.getIngredient();
+                    return new IngredientDTO(ing.getPhoto(),ing.getName(),ri.getQuantity());
+                })
+                .distinct() // Agar takroriy bo'lsa, bitta nusxasi olinadi
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(ingredientDTOS);
+    }
+
+    public HttpEntity<?> getStepsByRecipeId(Integer recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
+        return ResponseEntity.ok(recipe.getSteps());
     }
 }

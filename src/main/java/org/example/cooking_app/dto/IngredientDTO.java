@@ -1,10 +1,18 @@
 package org.example.cooking_app.dto;
 
-import lombok.Value;
+import lombok.Data;
+import org.example.cooking_app.entity.Attachment;
 
-@Value
+@Data
 public class IngredientDTO {
-    String name;
-    String fileName;
+   private String name;
+   private Attachment attachment;
+   private Integer quantity;
+
+    public IngredientDTO(Attachment attachment, String name, Integer quantity) {
+       this.name = name;
+       this.attachment = attachment;
+       this.quantity = quantity;
+   }
 
 }

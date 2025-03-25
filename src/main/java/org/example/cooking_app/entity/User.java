@@ -1,5 +1,6 @@
 package org.example.cooking_app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
@@ -33,10 +34,24 @@ public class User implements UserDetails {
     private List<Role> roles;
     private Integer tempCode;
     private String info;
-    @ManyToMany(fetch = FetchType.EAGER)
-    List<User> followers;
-    @ManyToMany(fetch = FetchType.EAGER)
-    List<User> followings;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "users_followers",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "followers_id")
+    )
+    @JsonIgnore
+    private List<User> followers;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(
+            name = "users_followings",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "followings_id")
+    )
+    @JsonIgnore
+    private List<User> followings;
+
     private String profession;
     @ManyToMany(fetch = FetchType.EAGER)
     private List<Recipe> savedRecipes;

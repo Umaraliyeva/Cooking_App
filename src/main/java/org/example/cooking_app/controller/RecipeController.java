@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.http.HttpServletRequest;
@@ -97,5 +98,20 @@ public class RecipeController {
                                    @RequestBody RecipeDTO  recipeDTO,
                                    @AuthenticationPrincipal User user) throws IOException {
         return ResponseEntity.status(201).body(recipeService.addRecipe(recipeDTO,user));
+    }
+
+
+
+    @Tag(name = "recipeni ostidagi ingredient btn bosilganda unga tegishli ingredientlar keladi")
+    @GetMapping("/ingredients/{recipeId}")
+    public HttpEntity<?> getIngredientById(@PathVariable Integer recipeId) {
+        return ResponseEntity.status(201).body(recipeService.getIngredientsByRecipeId(recipeId));
+    }
+
+
+    @Tag(name = "recipega tegishli proceduralar(steplar)")
+    @GetMapping("/step/{recipeId}")
+    public HttpEntity<?> getStepById(@PathVariable Integer recipeId) {
+        return ResponseEntity.status(201).body(recipeService.getStepsByRecipeId(recipeId));
     }
 }

@@ -1,5 +1,6 @@
 package org.example.cooking_app.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ public class RecipeIngredient {
     private Integer id;
 
     @ManyToOne
+    @JsonBackReference
     private Recipe recipe;
 
     @ManyToOne
