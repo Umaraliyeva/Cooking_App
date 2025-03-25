@@ -1,8 +1,6 @@
 package org.example.cooking_app.service;
 
-import org.example.cooking_app.dto.IngredientDTO;
 import org.example.cooking_app.dto.IngredientjonDTO;
-import org.example.cooking_app.dto.RecipeDTO;
 import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.*;
 import org.example.cooking_app.repo.*;
@@ -35,17 +33,15 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final RecentSearchRepository recentSearchRepository;
     private final AttachmentRepository attachmentRepository;
-    private final AttachmentContentRepository attachmentContentRepository;
     private final IngredientRepository ingredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final CategoryRepository categoryRepository;
 
-    public RecipeService(RecipeRepository recipeRepository, RecentSearchRepository recentSearchRepository, AttachmentRepository attachmentRepository, AttachmentContentRepository attachmentContentRepository, IngredientRepository ingredientRepository,
+    public RecipeService(RecipeRepository recipeRepository, RecentSearchRepository recentSearchRepository, AttachmentRepository attachmentRepository, IngredientRepository ingredientRepository,
                          RecipeIngredientRepository recipeIngredientRepository, CategoryRepository categoryRepository) {
         this.recipeRepository = recipeRepository;
         this.recentSearchRepository = recentSearchRepository;
         this.attachmentRepository = attachmentRepository;
-        this.attachmentContentRepository = attachmentContentRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.categoryRepository = categoryRepository;

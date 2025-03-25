@@ -1,18 +1,10 @@
 package org.example.cooking_app.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.annotation.MultipartConfig;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.Part;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.example.cooking_app.dto.RecipeDTO;
 import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.User;
@@ -20,7 +12,6 @@ import org.example.cooking_app.repo.RecentSearchRepository;
 import org.example.cooking_app.service.RecentSearchService;
 import org.example.cooking_app.service.RecipeService;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
