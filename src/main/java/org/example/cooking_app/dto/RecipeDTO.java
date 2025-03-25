@@ -32,7 +32,7 @@ public class RecipeDTO {
     private List<String> steps;
     private List<Integer> categoryIds;
 
-    private List<IngredientEntry> ingredients; // ID + quantity
+    private List<IngredientEntry> ingredientsOfRecipe; // ID + quantity
 
     @Data
     public static class IngredientEntry {

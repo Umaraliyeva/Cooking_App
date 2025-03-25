@@ -119,7 +119,7 @@ public class RecipeService {
     public HttpEntity<?> addRecipe(RecipeDTO recipedto, User user) throws IOException {
         // Avvalo duplicate ingredientlarni tekshirib chiqamiz:
         Set<Integer> ingredientIds = new HashSet<>();
-        for (RecipeDTO.IngredientEntry entry : recipedto.getIngredients()) {
+        for (RecipeDTO.IngredientEntry entry : recipedto.getIngredientsOfRecipe()) {
             if (!ingredientIds.add(entry.getIngredientId())) {
                 // Duplicate ingredient topildi, shuning uchun umuman recipe yaratilmasin
                 return ResponseEntity
@@ -130,7 +130,7 @@ public class RecipeService {
 
         // Agar duplicate topilmasa, recipe yaratishni davom ettiramiz:
         String link = recipedto.getName().replace(" ", "_");
-        Attachment attachment = attachmentRepository.findById(recipedto.getAttachment_id()).orElseThrow(()->new RuntimeException("Attachment not found"));
+        Attachment attachment = attachmentRepository.findById(recipedto.getPhotoId()).orElseThrow(()->new RuntimeException("Attachment not found"));
             Recipe recipe = Recipe.builder().
                     name(recipedto.getName()).
                     description(recipedto.getDescription())
@@ -148,7 +148,7 @@ public class RecipeService {
 
         // RecipeIngredient larni tayyorlaymiz
             List<RecipeIngredient> recipeIngredients = new ArrayList<>();
-        for (RecipeDTO.IngredientEntry entry : recipedto.getIngredients()) {
+        for (RecipeDTO.IngredientEntry entry : recipedto.getIngredientsOfRecipe()) {
             Ingredient ingredient = ingredientRepository.findById(entry.getIngredientId()).orElseThrow(() -> new RuntimeException("Ingredient not found"));
             RecipeIngredient recipeIngredient = RecipeIngredient.builder()
                     .recipe(recipe)
