@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/cooking
+    username: postgres
+    password: root123
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  application:
+    name: Cooking_App
+
+
+  oauth:
+
+       client-id: 1026650565956-dlrit5hqa3vm5j9dnavipnrstok53rgr.apps.googleusercontent.com
+       redirect-url: http://localhost:8080/api/oauth/oauth2/callback
+       auth-url: https://accounts.google.com/o/oauth2/v2/auth
+       client-secret: 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
+       token-url: https://oauth2.googleapis.com/token
+       USER-INFO-URL: https://www.googleapis.com/oauth2/v3/userinfo
+
+  facebook:
+    client-idFacebook: 1007571104606570
+    client-secretFacebook: dde11299012a92f5f082b76ffc174739
+    redirect-uriFacebook: http://localhost:8080/api/oauth/facebook/callback
+    token-urlFacebook: https://graph.facebook.com/v18.0/oauth/access_token
+    user-info-url: https://graph.facebook.com/me?fields=id,name,email
+
+

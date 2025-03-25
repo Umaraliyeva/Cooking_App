@@ -27,12 +27,10 @@ public class Recipe {
     private String description;
     @ManyToOne
     private Attachment photo;
-
     private Integer duration;
 
     @Min(value = 1) @Max(value = 5)
     private Integer likes;
-
     private String link;
     @ElementCollection
     private List<String> steps;
@@ -51,4 +49,5 @@ public class Recipe {
     private LocalDateTime createdAt; // vaqt berish kere qachon create qilinganiga qarab
                                     // recently added da sort qilib chiqaramiz
                                    //  masalan 2 kun oldin qo'shilgan yangi receptlarni chiqaramiz
+
 }

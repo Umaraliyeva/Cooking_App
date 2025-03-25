@@ -47,7 +47,7 @@ public class RecipeController {
 
 
     @Tag(name = " bugundan boshlab ohirgi 2 kun ichida creat qilingan yangi recipe larni olib keladi")
-    @GetMapping("/recentRecipes")
+    @GetMapping("/newRecipes")
     public HttpEntity<?> getRecentRecipes(){
         return ResponseEntity.status(200).body(recipeService.getRecipesFromLastTwoDays());
     }
@@ -74,8 +74,6 @@ public class RecipeController {
         List<Recipe> recipes = recipeService.filterRecipes(timeFilter, rateFilter, categoryId);
         return ResponseEntity.status(200).body(recipes);
     }
-
-
     @Tag(name = "user search, filter qilganda recipe ni ustiga bossa recipe id keladi , va recentSearch ga o'sha boskan recipe qo'shiladi ")
     @GetMapping("/search/{recipeId}")//o'zgartirish
     public ResponseEntity<?> getSearchedRecipeById(@PathVariable Integer recipeId,@AuthenticationPrincipal User user) {

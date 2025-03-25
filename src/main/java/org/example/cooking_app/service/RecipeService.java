@@ -4,6 +4,11 @@ import org.example.cooking_app.dto.IngredientDTO;
 import org.example.cooking_app.dto.RecipeDTO;
 import org.example.cooking_app.entity.*;
 import org.example.cooking_app.repo.*;
+import jakarta.persistence.criteria.Join;
+import org.example.cooking_app.entity.Recipe;
+import org.example.cooking_app.repo.RecentSearchRepository;
+import org.example.cooking_app.repo.RecipeRepository;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +22,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class RecipeService {
@@ -64,22 +73,44 @@ public class RecipeService {
     }
 
     public List<Recipe> filterRecipes(String timeFilter, Integer rateFilter, Integer categoryId) {
-        LocalDateTime fromDate = null;
-        LocalDateTime toDate = null;
-        List<Integer> popularRecipeIds = null;
+        Specification<Recipe> spec = Specification.where(null);
 
-        // 🕒 TIME FILTER
-        if ("newest".equalsIgnoreCase(timeFilter)) {
-            fromDate = LocalDateTime.now().minusDays(7);
-        } else if ("oldest".equalsIgnoreCase(timeFilter)) {
-            toDate = LocalDateTime.now().minusYears(1);
-        } else if ("popularity".equalsIgnoreCase(timeFilter)) {
-            popularRecipeIds = recentSearchRepository.findMostSearchedRecipeIds();
+        // 📌 POPULARITY bo‘yicha saralash
+        if ("popularity".equalsIgnoreCase(timeFilter)) {
+            List<Integer> popularRecipeIds = recentSearchRepository.findMostSearchedRecipeIds();
+            if (!popularRecipeIds.isEmpty()) {
+                spec = spec.and((root, query, criteriaBuilder) -> root.get("id").in(popularRecipeIds));
+            }
         }
 
-        // 📥 FILTER CALL
-        return recipeRepository.filterRecipes(fromDate, toDate, popularRecipeIds, rateFilter, categoryId, timeFilter);
+        // ⭐ RATE FILTER (likes >= rateFilter)
+        if (rateFilter != null) {
+            spec = spec.and((root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(root.get("likes"), rateFilter));
+        }
+
+        // 📂 CATEGORY FILTER
+        if (categoryId != null) {
+            spec = spec.and((root, query, criteriaBuilder) -> {
+                Join<Object, Object> categoryJoin = root.join("categories");
+                return criteriaBuilder.equal(categoryJoin.get("id"), categoryId);
+            });
+        }
+
+        Pageable pageable = PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, "createdAt"));
+        return recipeRepository.findAll(spec, pageable).getContent();
     }
+
+
+    private org.springframework.data.domain.Sort getSorting(String timeFilter) {
+        if ("newest".equalsIgnoreCase(timeFilter)) {
+            return Sort.by(Sort.Direction.DESC, "createdAt");
+        } else if ("oldest".equalsIgnoreCase(timeFilter)) {
+            return Sort.by(Sort.Direction.ASC, "createdAt");
+        }
+        return Sort.by(Sort.Direction.DESC, "createdAt");// Popularity sorting yuqorida hal qilindi
+    }
+
 
     public Recipe getRecipeById(Integer recipeId) {
         return recipeRepository.findById(recipeId).orElse(null);

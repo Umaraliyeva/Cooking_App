@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.annotation.MultipartConfig;
 import lombok.RequiredArgsConstructor;
 import org.example.cooking_app.dto.LoginDTO;
+import org.example.cooking_app.dto.OauthClientDTO;
 import org.example.cooking_app.entity.Attachment;
 import org.example.cooking_app.entity.AttachmentContent;
 import org.example.cooking_app.entity.Role;
@@ -23,25 +24,32 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("api/auth")
 @RequiredArgsConstructor
-//@MultipartConfig
+@MultipartConfig
 
 public class AuthController {
 
@@ -58,6 +66,8 @@ public class AuthController {
     private final AttachmentRepository attachmentRepository;
 
 
+
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDTO loginDTO) {
         try {
@@ -68,7 +78,7 @@ public class AuthController {
             User user = (User) authenticate.getPrincipal();
             String token = tokenService.generateToken(user);
 
-            return ResponseEntity.ok(Map.of("token", token)); // JSON shaklida qaytarish
+            return ResponseEntity.ok(Map.of("token", token));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
@@ -91,7 +101,6 @@ public class AuthController {
                 .attachment(attachment)
                 .build();
         attachmentContentRepository.save(attachmentContent);
-
         Role userRole = roleRepository.findByRoleName(RoleName.ROLE_USER).orElseThrow();
 
     User user = User.builder()

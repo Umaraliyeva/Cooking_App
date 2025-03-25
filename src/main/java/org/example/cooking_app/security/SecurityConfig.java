@@ -37,7 +37,7 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(requests ->
                 requests
-                        .requestMatchers( "/auth/**","/superAdmin/user/**","/role","/user","/user/**","/frontend/userCRUD.html", "/frontend/login.html","http://localhost:8080/file/**","/file/**", "/market/**", "/product/**", "/category/**").permitAll()
+                        .requestMatchers( "api/auth/**","/superAdmin/user/**","/role","/user","/user/**","/frontend/userCRUD.html", "/frontend/login.html","http://localhost:8080/file/**","/file/**", "/market/**", "/product/**", "/category/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/frontend/index.html").hasRole("ADMIN")
                         .requestMatchers("/frontend/editUser.html","/api/recipes").permitAll()
@@ -46,7 +46,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/**").permitAll()
                         .anyRequest().authenticated());
         http.userDetailsService(customUserDetailService);
-        http.addFilterBefore(myFilter,UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(myFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
