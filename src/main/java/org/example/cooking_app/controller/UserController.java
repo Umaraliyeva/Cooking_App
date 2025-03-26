@@ -60,19 +60,14 @@ public class UserController {
     }
 
     @Tag(name="follow qilinadi")
-    @PostMapping("/follow/{recipeId}")
-    public HttpEntity<?> follow(@PathVariable Integer recipeId, @AuthenticationPrincipal User user) {
-        // Recipe ni olish
-        Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> new RuntimeException("Recipe not found"));
-
-        // Recipe egasini olish
-        User recipeOwner = recipe.getUser();
+    @PostMapping("/follow/{userId}")
+    public HttpEntity<?> follow(@PathVariable Integer userId, @AuthenticationPrincipal User user) {
+        User recipeOwner = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User Not Found"));
 
         if (recipeOwner.equals(user)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("You can't follow yourself");
         }
-        Boolean follower = userRepository.isFollower(user.getId(), recipeId);
+        Boolean follower = userRepository.isFollower(recipeOwner.getId(),user.getId());
         // Agar foydalanuvchi allaqachon follow qilgan bo'lsa, xatolik qaytaramiz
         if (follower) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
@@ -87,14 +82,13 @@ public class UserController {
     }
 
     @Tag(name="unfollow qilinadi")
-    @DeleteMapping("/unfollow/{recipeId}")
-    public HttpEntity<?> unfollow(@PathVariable Integer recipeId, @AuthenticationPrincipal User user) {
-        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
-        User recipeOwner = recipe.getUser();
+    @DeleteMapping("/unfollow/{userId}")
+    public HttpEntity<?> unfollow(@PathVariable Integer userId, @AuthenticationPrincipal User user) {
+        User recipeOwner = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User Not Found"));
         if (recipeOwner.equals(user)) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("You can't unfollow yourself");
         }
-        Boolean follower = userRepository.isFollower(user.getId(), recipeId);
+        Boolean follower = userRepository.isFollower(recipeOwner.getId(),user.getId());
         if (follower) {
             recipeOwner.getFollowers().removeIf(followerjon -> followerjon.getId().equals(user.getId()));
             user.getFollowings().removeIf(following -> following.getId().equals(recipeOwner.getId()));

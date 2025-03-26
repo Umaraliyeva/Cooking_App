@@ -1,18 +1,17 @@
 package org.example.cooking_app.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 
 import java.util.List;
 
 @Value
+@Data
+@AllArgsConstructor
 public class UserDTO {
-    String email;
-    String password;
-    String fullName;
     String username;
-    List<Integer> roleIds;
-
-
-
+    String fullName;
 
 }

@@ -1,6 +1,7 @@
 package org.example.cooking_app.repo;
 
 import org.example.cooking_app.dto.ProfileDTO;
+import org.example.cooking_app.dto.UserDTO;
 import org.example.cooking_app.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,17 +14,28 @@ public interface UserRepository extends JpaRepository<User, Integer> {
   Optional<User> findByUsername(String username);
 
 
-  @Query(nativeQuery = true,value = """
-            select exists(select *
-            from recipe r
-                     inner join users_followers uf on r.user_id=uf.user_id
-                        and r.id=:recipeId
-                        and uf.followers_id=:userId)
-          """)
-  Boolean isFollower(int userId, int recipeId);
+//  @Query(nativeQuery = true,value = """
+//            select exists(select *
+//            from recipe r
+//                     inner join users_followers uf on r.user_id=uf.user_id
+//                        and r.id=:recipeId
+//                        and uf.followers_id=:userId)
+//          """)
+//  Boolean isFollower(int userId, int recipeId);
 
-  @Query("SELECT f FROM User u JOIN u.followers f WHERE u.id = :userId")
-  List<User> getFollowersByUserId(@Param("userId") Integer userId);
+  @Query(nativeQuery = true, value = """
+    select exists(
+        select *
+        from users_followers
+        where user_id = :recipeOwnerId
+          and followers_id = :followerId
+    )
+    """)
+  Boolean isFollower(int recipeOwnerId, int followerId);
+
+
+  @Query("SELECT new org.example.cooking_app.dto.UserDTO(f.username,f.fullName) FROM User u JOIN u.followers f WHERE u.id = :userId")
+  List<UserDTO> getFollowersByUserId(@Param("userId") Integer userId);
 
 
 
