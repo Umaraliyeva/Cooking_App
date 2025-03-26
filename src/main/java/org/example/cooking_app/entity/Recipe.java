@@ -50,4 +50,18 @@ public class Recipe {
                                     // recently added da sort qilib chiqaramiz
                                    //  masalan 2 kun oldin qo'shilgan yangi receptlarni chiqaramiz
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Recipe)) return false;
+        Recipe recipe = (Recipe) o;
+        return id != null && id.equals(recipe.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return 31;
+    }
+
+
 }

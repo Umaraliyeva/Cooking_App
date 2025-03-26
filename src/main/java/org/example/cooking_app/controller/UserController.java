@@ -42,18 +42,20 @@ public class UserController {
         return ResponseEntity.ok(userData);
     }
 
+
+    @Tag(name="recipeni save qilish")
     @PostMapping("/save-recipe/{recipeId}")
-    public ResponseEntity<String> toggleSaveRecipe(@PathVariable Integer recipeId,
-                                                   @AuthenticationPrincipal User user) {
-        String status = userService.manageSaveAndUnSaveRecipe(user, recipeId);
-        return ResponseEntity.ok(status);
+    public HttpEntity<?> toggleSaveRecipe(@PathVariable Integer recipeId,
+                                               @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(userService.saveRecipe(user, recipeId));
     }
 
-    @GetMapping("/is-saved/{recipeId}")
-    public ResponseEntity<Boolean> isRecipeSaved(@PathVariable Integer recipeId,
+
+    @Tag(name="recipeni unsave qilish")
+    @DeleteMapping("/unsave-recipe/{recipeId}")
+    public HttpEntity<?> isRecipeSaved(@PathVariable Integer recipeId,
                                                  @AuthenticationPrincipal User user) {
-        boolean isSaved = userService.isRecipeSaved(user, recipeId);
-        return ResponseEntity.ok(isSaved);
+        return ResponseEntity.ok(userService.unsaveRecipe(user, recipeId));
 
     }
 
