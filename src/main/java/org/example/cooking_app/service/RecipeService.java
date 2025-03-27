@@ -1,6 +1,8 @@
 package org.example.cooking_app.service;
 
+import org.example.cooking_app.dto.CategoryDTO;
 import org.example.cooking_app.dto.IngredientjonDTO;
+import org.example.cooking_app.dto.RecipeDTO;
 import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.*;
 import org.example.cooking_app.repo.*;
@@ -17,10 +19,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -110,8 +109,29 @@ public class RecipeService {
     }
 
 
-    public Recipe getRecipeById(Integer recipeId) {
-        return recipeRepository.findById(recipeId).orElse(null);
+    public RecipejonDTO getRecipe(Integer recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
+        RecipejonDTO recipejonDTO = new RecipejonDTO();
+        recipejonDTO.setName(recipe.getName());
+        recipejonDTO.setDescription(recipe.getDescription());
+        recipejonDTO.setSteps(recipe.getSteps());
+        recipejonDTO.setDuration(recipe.getDuration());
+        recipejonDTO.setPhotoId(recipe.getPhoto().getId());
+
+        // Listlarni initsializatsiya qilamiz
+        recipejonDTO.setCategoryIds(new ArrayList<>());
+        recipejonDTO.setIngredientsOfRecipe(new ArrayList<>());
+
+        for (Category category : recipe.getCategories()) {
+            recipejonDTO.getCategoryIds().add(category.getId());
+        }
+        for (RecipeIngredient recipeIngredient : recipe.getRecipeIngredients()) {
+            RecipejonDTO.IngredientEntry entry = new RecipejonDTO.IngredientEntry();
+            entry.setIngredientId(recipeIngredient.getIngredient().getId());
+            entry.setQuantity(recipeIngredient.getQuantity());
+            recipejonDTO.getIngredientsOfRecipe().add(entry);
+        }
+        return recipejonDTO;
     }
 
     public HttpEntity<?> addRecipe(RecipejonDTO recipejondto, User user) throws IOException {
@@ -148,15 +168,17 @@ public class RecipeService {
             List<RecipeIngredient> recipeIngredients = new ArrayList<>();
         for (RecipejonDTO.IngredientEntry entry : recipejondto.getIngredientsOfRecipe()) {
             Ingredient ingredient = ingredientRepository.findById(entry.getIngredientId()).orElseThrow(() -> new RuntimeException("Ingredient not found"));
-            RecipeIngredient recipeIngredient = RecipeIngredient.builder()
-                    .recipe(recipe)
-                    .ingredient(ingredient)
-                    .quantity(entry.getQuantity())
-                    .build();
-            recipeIngredients.add(recipeIngredient);
+            if(entry.getQuantity()!=0) {
+                RecipeIngredient recipeIngredient = RecipeIngredient.builder()
+                        .recipe(recipe)
+                        .ingredient(ingredient)
+                        .quantity(entry.getQuantity())
+                        .build();
+                recipeIngredients.add(recipeIngredient);
+            }
         }
             recipeIngredientRepository.saveAll(recipeIngredients);
-            return ResponseEntity.status(HttpStatus.CREATED).body(recipe);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Recipe added successfully");
     }
 
     public HttpEntity<?> getIngredientsByRecipeId(Integer recipeId) {
@@ -177,5 +199,76 @@ public class RecipeService {
     public HttpEntity<?> getStepsByRecipeId(Integer recipeId) {
         Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
         return ResponseEntity.ok(recipe.getSteps());
+    }
+
+    public HttpEntity<?> updateRecipe(Integer recipeId, RecipejonDTO recipejondto, User user) {
+        // 1. Mavjud recipe ni olish
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new RuntimeException("Recipe not found"));
+
+        // 2. (Ixtiyoriy) Foydalanuvchi recipe ustida o‘zgarish kiritish huquqiga ega ekanligini tekshirish
+        if (!recipe.getUser().equals(user)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Siz ushbu recipe ni yangilash huquqiga ega emassiz");
+        }
+
+        // 3. Duplicate ingredientlarni tekshirish
+        Set<Integer> ingredientIds = new HashSet<>();
+        for (RecipejonDTO.IngredientEntry entry : recipejondto.getIngredientsOfRecipe()) {
+            if (!ingredientIds.add(entry.getIngredientId())) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body("Duplicate ingredient topildi: ingredientId = " + entry.getIngredientId());
+            }
+        }
+
+        // 4. Recipe ning asosiy maydonlarini yangilash
+        recipe.setName(recipejondto.getName());
+        recipe.setDescription(recipejondto.getDescription());
+        recipe.setDuration(recipejondto.getDuration());
+        recipe.setSteps(new ArrayList<>(recipejondto.getSteps()));
+
+        // Yangi link yaratish
+        String link = recipejondto.getName().replace(" ", "_");
+        recipe.setLink("app.Recipe.co/" + link);
+
+        // 5. Agar photo o'zgargan bo'lsa, yangi Attachment ni yuklash
+        if (!recipe.getPhoto().getId().equals(recipejondto.getPhotoId())) {
+            Attachment attachment = attachmentRepository.findById(recipejondto.getPhotoId())
+                    .orElseThrow(() -> new RuntimeException("Attachment not found"));
+            recipe.setPhoto(attachment);
+        }
+
+        // 6. Kategoriyalarni yangilash
+        List<Category> categories = categoryRepository.findAllById(recipejondto.getCategoryIds());
+        recipe.setCategories(categories);
+
+        // 7. Recipe ni yangilab saqlash
+        recipeRepository.save(recipe);
+
+        // 8. RecipeIngredient larni yangilash:
+        //    Avval eski ingredientlarni o'chirib tashlaymiz (agar orphanRemoval qo'llanilgan bo'lsa, bu etarli)
+        recipeIngredientRepository.deleteByRecipe(recipe); // repository da bunday metodni yarating
+
+        List<RecipeIngredient> recipeIngredients = new ArrayList<>();
+        for (RecipejonDTO.IngredientEntry entry : recipejondto.getIngredientsOfRecipe()) {
+            Ingredient ingredient = ingredientRepository.findById(entry.getIngredientId())
+                    .orElseThrow(() -> new RuntimeException("Ingredient not found"));
+            if (entry.getQuantity() != 0) {
+                RecipeIngredient recipeIngredient = RecipeIngredient.builder()
+                        .recipe(recipe)
+                        .ingredient(ingredient)
+                        .quantity(entry.getQuantity())
+                        .build();
+                recipeIngredients.add(recipeIngredient);
+            }
+        }
+        recipeIngredientRepository.saveAll(recipeIngredients);
+
+        // 9. Yangilangan recipe ni qaytaramiz
+        return ResponseEntity.ok("Recipe successfully updated!");
+    }
+
+    public Recipe getRecipeById(Integer recipeId) {
+        return recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
     }
 }

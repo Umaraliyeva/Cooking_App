@@ -3,6 +3,7 @@ package org.example.cooking_app.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.annotation.MultipartConfig;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.cooking_app.dto.RecipejonDTO;
@@ -77,7 +78,7 @@ public class RecipeController {
     @Tag(name = "user birinchi kirganida chiqib turgan retseptlardan birortasini tanlaganda id keladi")
     @GetMapping("/{recipeId}")
     public ResponseEntity<?> getRecipeById(@PathVariable Integer recipeId) {
-       return ResponseEntity.status(201).body(recipeService.getRecipeById(recipeId));
+       return ResponseEntity.status(201).body(recipeService.getRecipe(recipeId));
 
     }
 
@@ -103,5 +104,12 @@ public class RecipeController {
     @GetMapping("/step/{recipeId}")
     public HttpEntity<?> getStepById(@PathVariable Integer recipeId) {
         return ResponseEntity.status(201).body(recipeService.getStepsByRecipeId(recipeId));
+    }
+
+    @Tag(name = "recipeni update qilish")
+    @PutMapping("/update/{recipeId}")
+    @Transactional
+    public HttpEntity<?> updateRecipe(@PathVariable Integer recipeId, @RequestBody RecipejonDTO recipejonDTO, @AuthenticationPrincipal User user) {
+        return ResponseEntity.status(201).body(recipeService.updateRecipe(recipeId,recipejonDTO,user));
     }
 }

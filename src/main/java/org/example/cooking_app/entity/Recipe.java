@@ -1,5 +1,6 @@
 package org.example.cooking_app.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
@@ -35,7 +36,8 @@ public class Recipe {
     @ElementCollection
     private List<String> steps;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
     private User user;
 
     @ManyToMany
