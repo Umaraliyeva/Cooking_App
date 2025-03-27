@@ -10,6 +10,7 @@ import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.RecentSearchRepository;
+import org.example.cooking_app.repo.RecipeRepository;
 import org.example.cooking_app.service.RecentSearchService;
 import org.example.cooking_app.service.RecipeService;
 import org.springframework.http.HttpEntity;
@@ -30,6 +31,7 @@ public class RecipeController {
     private final RecentSearchService recentSearchService;
     private final RecentSearchRepository recentSearchRepository;
     private final ObjectMapper jacksonObjectMapper;
+    private final RecipeRepository recipeRepository;
 
 
     @Tag(name = "category id bo'yicha sort qilingan recipe lar")
@@ -111,5 +113,17 @@ public class RecipeController {
     @Transactional
     public HttpEntity<?> updateRecipe(@PathVariable Integer recipeId, @RequestBody RecipejonDTO recipejonDTO, @AuthenticationPrincipal User user) {
         return ResponseEntity.status(201).body(recipeService.updateRecipe(recipeId,recipejonDTO,user));
+    }
+
+    @Tag(name = "recipe delete qilish")
+    @DeleteMapping("/delete/{recipeId}")
+    public HttpEntity<?> deleteRecipe(@PathVariable Integer recipeId, @AuthenticationPrincipal User user) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
+        if (recipe.getUser().equals(user)){
+            recipeRepository.delete(recipe);
+            return ResponseEntity.status(200).body("Recipe deleted");
+        }else {
+            return ResponseEntity.status(404).body("This is not the recipe for you.");
+        }
     }
 }
