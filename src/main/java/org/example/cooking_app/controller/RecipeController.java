@@ -8,12 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.Recipe;
+import org.example.cooking_app.entity.RecipeRating;
 import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.RecentSearchRepository;
+import org.example.cooking_app.repo.RecipeRatingRepository;
 import org.example.cooking_app.repo.RecipeRepository;
 import org.example.cooking_app.service.RecentSearchService;
 import org.example.cooking_app.service.RecipeService;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +35,7 @@ public class RecipeController {
     private final RecentSearchRepository recentSearchRepository;
     private final ObjectMapper jacksonObjectMapper;
     private final RecipeRepository recipeRepository;
+    private final RecipeRatingRepository recipeRatingRepository;
 
 
     @Tag(name = "category id bo'yicha sort qilingan recipe lar")
@@ -125,5 +129,12 @@ public class RecipeController {
         }else {
             return ResponseEntity.status(404).body("This is not the recipe for you.");
         }
+    }
+
+
+    @Tag(name = "recipega rating berish")
+    @PostMapping("/rate/{recipeId}")
+    public HttpEntity<?> rateRecipe(@PathVariable Integer recipeId,@RequestParam Integer rating, @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(recipeService.saveRating(recipeId,user,rating));
     }
 }

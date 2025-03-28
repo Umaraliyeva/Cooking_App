@@ -30,8 +30,11 @@ public class Recipe {
     private Attachment photo;
     private Integer duration;
 
-    @Min(value = 1) @Max(value = 5)
-    private Integer likes;
+//    @Min(value = 1) @Max(value = 5)
+//    private Integer likes;
+
+    private Double rating;
+
     private String link;
     @ElementCollection
     private List<String> steps;

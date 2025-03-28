@@ -35,15 +35,17 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final CategoryRepository categoryRepository;
+    private final RecipeRatingRepository recipeRatingRepository;
 
     public RecipeService(RecipeRepository recipeRepository, RecentSearchRepository recentSearchRepository, AttachmentRepository attachmentRepository, IngredientRepository ingredientRepository,
-                         RecipeIngredientRepository recipeIngredientRepository, CategoryRepository categoryRepository) {
+                         RecipeIngredientRepository recipeIngredientRepository, CategoryRepository categoryRepository, RecipeRatingRepository recipeRatingRepository) {
         this.recipeRepository = recipeRepository;
         this.recentSearchRepository = recentSearchRepository;
         this.attachmentRepository = attachmentRepository;
         this.ingredientRepository = ingredientRepository;
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.categoryRepository = categoryRepository;
+        this.recipeRatingRepository = recipeRatingRepository;
     }
 
     public HttpEntity<?> getRecipesByCategory(Integer categoryId) {
@@ -270,5 +272,42 @@ public class RecipeService {
 
     public Recipe getRecipeById(Integer recipeId) {
         return recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
+    }
+
+    public HttpEntity<?> saveRating(Integer recipeId, User user, Integer rating) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> new RuntimeException("Recipe not found"));
+        if (rating<1||rating>5){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).
+                    body("Rating should be between 1 and 5");
+        }
+
+        RecipeRating existingRating = recipeRatingRepository.findByRecipeAndUser(recipe, user);
+        if (existingRating != null) {
+            existingRating.setRating(rating);
+            recipeRatingRepository.save(existingRating);
+        }else {
+            RecipeRating recipeRating = RecipeRating.builder()
+                    .recipe(recipe)
+                    .rating(rating)
+                    .user(user)
+                    .build();
+            recipeRatingRepository.save(recipeRating);
+        }
+
+        Double averageRating=calculateAverageRating(recipe);
+
+        recipe.setRating(averageRating);
+        recipeRepository.save(recipe);
+        return ResponseEntity.ok("Rating successfully saved!.Recipe's average rating: "+averageRating);
+
+    }
+
+    private Double calculateAverageRating(Recipe recipe) {
+        List<RecipeRating> ratings = recipeRatingRepository.findByRecipe(recipe);
+        if (ratings.isEmpty()) {
+            return 0.0;
+        }
+        double sum= ratings.stream().mapToInt(RecipeRating::getRating).sum();
+        return sum/ratings.size();
     }
 }
