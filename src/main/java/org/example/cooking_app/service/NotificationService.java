@@ -11,6 +11,7 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +28,21 @@ public class NotificationService {
         notificationRepository.save(notification);
         simpMessageSendingOperations.convertAndSend("/topic/news", message);
         return ResponseEntity.status(200).body(notification);
+    }
+
+
+    public HttpEntity<?> createNotifications(List<User> receivers, String message) {
+        List<Notification> notifications = new ArrayList<>();
+
+        for (User receiver : receivers) {
+            Notification notification = new Notification(null, message, false, LocalDateTime.now(), receiver);
+            notifications.add(notification);
+        }
+
+        notificationRepository.saveAll(notifications);
+        simpMessageSendingOperations.convertAndSend("/topic/news", message);
+
+        return ResponseEntity.status(200).body(notifications);
     }
 
     public List<Map<String, Object>> getAllNotificationsByUserId(Integer id) {
