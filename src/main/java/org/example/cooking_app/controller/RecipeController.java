@@ -10,6 +10,7 @@ import org.example.cooking_app.dto.RecipejonDTO;
 import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.RecipeRating;
 import org.example.cooking_app.entity.User;
+import org.example.cooking_app.repo.CommentRepository;
 import org.example.cooking_app.repo.RecentSearchRepository;
 import org.example.cooking_app.repo.RecipeRatingRepository;
 import org.example.cooking_app.repo.RecipeRepository;
@@ -36,6 +37,7 @@ public class RecipeController {
     private final ObjectMapper jacksonObjectMapper;
     private final RecipeRepository recipeRepository;
     private final RecipeRatingRepository recipeRatingRepository;
+    private final CommentRepository commentRepository;
 
 
     @Tag(name = "category id bo'yicha sort qilingan recipe lar")

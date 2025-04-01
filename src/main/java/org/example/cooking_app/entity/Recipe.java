@@ -50,6 +50,9 @@ public class Recipe {
     @JsonManagedReference
     private List<RecipeIngredient> recipeIngredients;
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
     @CreationTimestamp
     private LocalDateTime createdAt; // vaqt berish kere qachon create qilinganiga qarab
                                     // recently added da sort qilib chiqaramiz
