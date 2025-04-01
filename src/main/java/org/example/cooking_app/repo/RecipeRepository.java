@@ -32,9 +32,9 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer>, JpaSpe
             "(:fromDate IS NULL OR r.created_at >= :fromDate) AND " +
             "(:toDate IS NULL OR r.created_at <= :toDate) AND " +
             "(:popularRecipeIds IS NULL OR r.id = ANY(:popularRecipeIds::int[])) AND " +
-            "(:rateFilter IS NULL OR r.likes >= :rateFilter) AND " +
+            "(:rateFilter IS NULL OR r.rating >= :rateFilter) AND " +
             "(:categoryId IS NULL OR EXISTS (SELECT 1 FROM recipe_categories rc WHERE rc.recipe_id = r.id AND rc.categories_id = :categoryId)) " +
-            "GROUP BY r.id, r.created_at, r.likes " +
+            "GROUP BY r.id, r.created_at, r.rating " +
             "ORDER BY " +
             "COALESCE(CASE WHEN :timeFilter = 'newest' THEN r.created_at END, '1970-01-01') DESC, " +
             "COALESCE(CASE WHEN :timeFilter = 'oldest' THEN r.created_at END, '1970-01-01') ASC, " +
@@ -57,13 +57,13 @@ public interface RecipeRepository extends JpaRepository<Recipe, Integer>, JpaSpe
 
     //Profile uchun recipe dan kerakli malumotlarni yegib olish
     @Query(value = """
-    SELECT r.id, r.name, r.description, r.photo_id AS photoId, r.duration, r.likes, 
+    SELECT r.id, r.name, r.description, r.photo_id AS photoId, r.duration, r.rating, 
            r.link, STRING_AGG(s.steps, ',') AS steps, 
            r.created_at AS createdAt  
     FROM recipe r
     LEFT JOIN recipe_steps s ON r.id = s.recipe_id
     WHERE r.user_id = :userId
-    GROUP BY r.id, r.name, r.description, r.photo_id, r.duration, r.likes, 
+    GROUP BY r.id, r.name, r.description, r.photo_id, r.duration, r.rating, 
              r.link, r.created_at
     ORDER BY r.created_at DESC
 """, nativeQuery = true)

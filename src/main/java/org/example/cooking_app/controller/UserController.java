@@ -6,6 +6,7 @@ import org.example.cooking_app.entity.Recipe;
 import org.example.cooking_app.entity.User;
 import org.example.cooking_app.repo.RecipeRepository;
 import org.example.cooking_app.repo.UserRepository;
+import org.example.cooking_app.service.NotificationService;
 import org.example.cooking_app.service.UserService;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ public class UserController {
     private final UserService userService;
     private final RecipeRepository recipeRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Tag(name = "login qilgan Userning infolari ")
     @GetMapping()
@@ -77,6 +79,7 @@ public class UserController {
             user.getFollowings().add(recipeOwner);
             userRepository.save(user);
             userRepository.save(recipeOwner);
+            notificationService.createNotification(recipeOwner, user.getFullName() + " sizga obuna bo'ldi");
             return ResponseEntity.ok(userRepository.getFollowersByUserId(recipeOwner.getId()));
         }
     }

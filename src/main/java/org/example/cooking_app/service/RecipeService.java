@@ -36,9 +36,10 @@ public class RecipeService {
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final CategoryRepository categoryRepository;
     private final RecipeRatingRepository recipeRatingRepository;
+    private final NotificationService notificationService;
 
     public RecipeService(RecipeRepository recipeRepository, RecentSearchRepository recentSearchRepository, AttachmentRepository attachmentRepository, IngredientRepository ingredientRepository,
-                         RecipeIngredientRepository recipeIngredientRepository, CategoryRepository categoryRepository, RecipeRatingRepository recipeRatingRepository) {
+                         RecipeIngredientRepository recipeIngredientRepository, CategoryRepository categoryRepository, RecipeRatingRepository recipeRatingRepository, NotificationService notificationService) {
         this.recipeRepository = recipeRepository;
         this.recentSearchRepository = recentSearchRepository;
         this.attachmentRepository = attachmentRepository;
@@ -46,6 +47,7 @@ public class RecipeService {
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.categoryRepository = categoryRepository;
         this.recipeRatingRepository = recipeRatingRepository;
+        this.notificationService = notificationService;
     }
 
     public HttpEntity<?> getRecipesByCategory(Integer categoryId) {
@@ -165,6 +167,8 @@ public class RecipeService {
         recipe.setCategories(categories);
 
         recipeRepository.save(recipe);
+        List<User> followers = user.getFollowers();
+        notificationService.createNotifications(followers, user.getFullName() + ": yangi recipe qoshdi -> " + recipe.getName());
 
         // RecipeIngredient larni tayyorlaymiz
             List<RecipeIngredient> recipeIngredients = new ArrayList<>();
